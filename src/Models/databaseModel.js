@@ -1,16 +1,18 @@
+require('dotenv').config();  // Carregar variáveis de ambiente
+
 import firebird from "node-firebird";
 
 const Dboptions = {
-    host: "localhost",
-    port: 3050,
-    database: "D:\\CLAUDIO.FDB",
-    user: "SYSDBA",
-    password: "masterkey",
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_DATABASE,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     lowercase_keys: false,
     role: null,
     pageSize: 4096,
-    charset: "none",
-    fontcharset: "UTF8"
+    charset: process.env.DB_CHARSET,
+    fontcharset: "UTF8"  // Se necessário para o charset da fonte
 };
 
 // Conectar ao banco de dados
@@ -21,8 +23,8 @@ firebird.attach(Dboptions, (err, db) => {
     }
     console.log("Conectado ao Firebird!");
 
-    // Importante: Fechar a conexão quando não for mais necessária
+    // Fechar a conexão após conectar
     db.detach();
 });
 
-export {Dboptions};
+export { Dboptions };
