@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate, Outlet, useLocation } from "react-router-dom";
 import { Menu, Home, FileText, MessageSquareMore, LogOut, Settings } from "lucide-react";
-import FloatingChatbot from "./Botao/botaoFlutuanteView.jsx"
 
 function Principal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -104,7 +103,6 @@ function Principal() {
         </nav>
         <div>
       {/* Seu conteúdo do site */}
-      <FloatingChatbot />
     </div>
         
         <button

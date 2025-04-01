@@ -1,3 +1,4 @@
+import helmet  from 'helmet';
 import express from 'express';
 import cors from 'cors';
 import { login, NovoLogin } from './Controllers/authController.js';
@@ -10,6 +11,7 @@ import {
 } from './Controllers/informacoesController.js';
 import { buscarConfiguracoes } from './Controllers/configuracoesController.js'
 const app = express();
+app.use(helmet());
 
 // Middlewares
 app.use(express.json()); // Para parsear JSON no corpo da requisição
