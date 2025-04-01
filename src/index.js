@@ -17,30 +17,33 @@ app.use(helmet());
 app.use(express.json()); // Para parsear JSON no corpo da requisição
 app.use(cors()); // Habilita o CORS
 
-// ROTA DE AUTENTICAÇÃO (não protegida, pois a autenticação é necessária para obter o token)
 app.post('/login', login);
 app.post('/nlogin', NovoLogin)
 
 // ROTA DO CHATBOT
 app.post("/chatbot", async (req, res) => {
-  const prompt = (req.body.prompt || "").trim(); // Sanitização básica
+  let prompt = req.body.prompt;
+
+  // Garantir que 'prompt' existe e é uma string
+  if (typeof prompt !== 'string') {
+    return res.status(400).json({ error: "O campo 'prompt' deve ser uma string." });
+  }
+
+  // Realiza o trim após a validação
+  prompt = prompt.trim();
 
   if (!prompt) {
     return res.status(400).json({ error: "Prompt não fornecido." });
   }
 
   try {
-    // Definição das regras com delimitador forte
-
-    // Chamada para geração de texto
+    // Chama a lógica para gerar o texto
     const resposta = await GeraTexto(prompt, req.headers["user-email"]);
-    
     res.json({ response: resposta });
   } catch (error) {
     res.status(500).json({ error: "Erro ao processar a requisição." });
   }
 });
-
 
 
 // ROTAS DE INFORMAÇÕES
