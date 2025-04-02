@@ -54,6 +54,7 @@ app.delete("/informacoes/:id", excluirInformacao);
 app.get("/configuracoes", buscarConfiguracoes);
 
 // Inicialização do servidor
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+

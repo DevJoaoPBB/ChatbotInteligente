@@ -26,7 +26,7 @@ const Informacoes = () => {
     }
   }, []);
 
-  const API_URL = process.env.REACT_APP_API_URL; // Pegando a URL da API do .env
+  const API_URL = "http://35.209.172.168:7373"; // Pegando a URL da API do .env
 
 const fetchInformacoes = async () => {
   try {
