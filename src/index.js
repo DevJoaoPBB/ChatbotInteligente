@@ -1,6 +1,7 @@
-import helmet  from 'helmet';
+import helmet from 'helmet';
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { login, NovoLogin } from './Controllers/authController.js';
 import { GeraTexto } from './Controllers/IAController.js';
 import {
@@ -9,7 +10,12 @@ import {
   editarInformacao,
   excluirInformacao,
 } from './Controllers/informacoesController.js';
-import { buscarConfiguracoes } from './Controllers/configuracoesController.js'
+import { buscarConfiguracoes } from './Controllers/configuracoesController.js';
+
+dotenv.config(); // Carregar variáveis do .env
+
+const PORT = process.env.PORT || 7373;
+
 const app = express();
 app.use(helmet());
 
@@ -17,49 +23,37 @@ app.use(helmet());
 app.use(express.json()); // Para parsear JSON no corpo da requisição
 app.use(cors()); // Habilita o CORS
 
+// Rotas de autenticação
 app.post('/login', login);
-app.post('/nlogin', NovoLogin)
+app.post('/nlogin', NovoLogin);
 
-// ROTA DO CHATBOT
+// Rota do chatbot
 app.post("/chatbot", async (req, res) => {
-  let prompt = req.body.prompt;
+  let { prompt } = req.body;
 
-  // Garantir que 'prompt' existe e é uma string
-  if (typeof prompt !== 'string') {
-    return res.status(400).json({ error: "O campo 'prompt' deve ser uma string." });
-  }
-
-  // Realiza o trim após a validação
-  prompt = prompt.trim();
-
-  if (!prompt) {
-    return res.status(400).json({ error: "Prompt não fornecido." });
+  if (typeof prompt !== 'string' || !prompt.trim()) {
+    return res.status(400).json({ error: "O campo 'prompt' deve ser uma string não vazia." });
   }
 
   try {
-    // Chama a lógica para gerar o texto
-    const resposta = await GeraTexto(prompt, req.headers["user-email"]);
+    const resposta = await GeraTexto(prompt.trim(), req.headers["user-email"]);
     res.json({ response: resposta });
   } catch (error) {
+    console.error("Erro ao processar a requisição:", error);
     res.status(500).json({ error: "Erro ao processar a requisição." });
   }
 });
 
+// Rotas de informações
+app.get("/informacoes", buscarInformacoes);
+app.post("/informacoes", adicionarInformacao);
+app.put("/informacoes/:id", editarInformacao);
+app.delete("/informacoes/:id", excluirInformacao);
 
-// ROTAS DE INFORMAÇÕES
-app.get("/informacoes", buscarInformacoes); // Protege a rota
-app.post("/informacoes", adicionarInformacao); // Protege a rota
-app.put("/informacoes/:id", editarInformacao); // Protege a rota
-app.delete("/informacoes/:id", excluirInformacao); // Protege a rota
-
-//ROTAS DE CONFIGURAÇÕES
-app.get("/configuracoes", buscarConfiguracoes)
-
-
-// Recupera a porta do .env ou usa 7373 como padrão
-const port = 7373;
+// Rota de configurações
+app.get("/configuracoes", buscarConfiguracoes);
 
 // Inicialização do servidor
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });

@@ -26,37 +26,39 @@ const Informacoes = () => {
     }
   }, []);
 
-  const fetchInformacoes = async () => {
-    try {
-      const userEmail = localStorage.getItem("userEmail");
+  const API_URL = process.env.REACT_APP_API_URL; // Pegando a URL da API do .env
 
-      if (!userEmail) {
-        toast.warning("Usuário não autenticado. Faça login novamente!"); // Alerta de aviso
-        return;
-      }
+const fetchInformacoes = async () => {
+  try {
+    const userEmail = localStorage.getItem("userEmail");
 
-      const response = await fetch("http://localhost:7373/informacoes", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "user-email": userEmail, // Passa o e-mail no cabeçalho
-        },
-      });
-
-      if (!response.ok) {
-        //throw new Error();
-        toast.error(`Erro ao buscar informações: ${response.statusText}`); // Alerta de erro
-      }
-
-      const data = await response.json();
-      setInformacoes(data.data);
-    } catch (error) {
-      console.error("Erro ao carregar informações:", error);
-      toast.error("Erro ao carregar informações." || error.message); // Alerta de erro
-    } finally {
-      setCarregando(false);
+    if (!userEmail) {
+      toast.warning("Usuário não autenticado. Faça login novamente!"); // Alerta de aviso
+      return;
     }
-  };
+
+    const response = await fetch(`${API_URL}/informacoes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "user-email": userEmail, // Passa o e-mail no cabeçalho
+      },
+    });
+
+    if (!response.ok) {
+      toast.error(`Erro ao buscar informações: ${response.statusText}`); // Alerta de erro
+      return;
+    }
+
+    const data = await response.json();
+    setInformacoes(data.data);
+  } catch (error) {
+    console.error("Erro ao carregar informações:", error);
+    toast.error("Erro ao carregar informações." || error.message); // Alerta de erro
+  } finally {
+    setCarregando(false);
+  }
+};
 
 
   useEffect(() => {
