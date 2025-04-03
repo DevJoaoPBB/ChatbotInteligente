@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import logo from "../../Assets/Imagens/icone.PNG";
+import logo from "./icone.png";
 import { ToastContainer, toast } from "react-toastify";
 import { Loader } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css"; // Estilos padrão
