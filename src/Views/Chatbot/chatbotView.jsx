@@ -129,7 +129,7 @@ function Chatbot() {
     try {
       const userEmail = localStorage.getItem("userEmail");
 
-      const response = await fetch("http://localhost:7373/chatbot", {
+      const response = await fetch("https://chatbotinteligente-x5rt.onrender.com/chatbot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

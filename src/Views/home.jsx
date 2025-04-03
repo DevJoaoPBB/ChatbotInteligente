@@ -121,7 +121,7 @@ function Principal() {
         {showInfo && (
           <div >
             <div className="flex-1 bg-blue-200 p-4 rounded-2xl shadow-md mb-4">
-              <h1 className="text-xl font-semibold">{saudacao()} {localStorage.getItem("userName")}! </h1>
+              <h1 className="text-xl font-semibold">{saudacao()}! </h1>
               <p>Aqui estão algumas informações importantes para começar {turno()}.</p>
             </div>
           </div>
