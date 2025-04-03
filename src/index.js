@@ -10,7 +10,8 @@ import {
   editarInformacao,
   excluirInformacao,
 } from './Controllers/informacoesController.js';
-import { buscarConfiguracoes } from './Controllers/configuracoesController.js';
+import { buscarConfiguracoes } from './Controllers/configuracoesController.js'; 
+import { verifyToken } from './Middleware/authMiddleware.js'; // Middleware de autenticação
 
 dotenv.config(); // Carregar variáveis do .env
 
@@ -25,18 +26,23 @@ app.use(cors()); // Habilita o CORS
 
 // Rotas de autenticação
 app.post('/login', login);
-app.post('/nlogin', NovoLogin);
+app.post('/register', NovoLogin); 
 
 // Rota do chatbot
 app.post("/chatbot", async (req, res) => {
   let { prompt } = req.body;
+  const userEmail = req.headers["user-email"];
+
+  if (!userEmail) {
+    return res.status(400).json({ error: "Email do usuário é obrigatório!" });
+  }
 
   if (typeof prompt !== 'string' || !prompt.trim()) {
-    return res.status(400).json({ error: "O campo 'prompt' deve ser uma string não vazia." });
+    return res.status(400).json({ error: "Nenhuma informação enviada para a I.A!" });
   }
 
   try {
-    const resposta = await GeraTexto(prompt.trim(), req.headers["user-email"]);
+    const resposta = await GeraTexto(prompt.trim(), userEmail);
     res.json({ response: resposta });
   } catch (error) {
     console.error("Erro ao processar a requisição:", error);
@@ -44,17 +50,16 @@ app.post("/chatbot", async (req, res) => {
   }
 });
 
-// Rotas de informações
-app.get("/informacoes", buscarInformacoes);
-app.post("/informacoes", adicionarInformacao);
-app.put("/informacoes/:id", editarInformacao);
-app.delete("/informacoes/:id", excluirInformacao);
+// Rotas de informações (Protegidas por autenticação)
+app.get("/informacoes", verifyToken, buscarInformacoes);
+app.post("/informacoes", verifyToken, adicionarInformacao);
+app.put("/informacoes/:id", verifyToken, editarInformacao);
+app.delete("/informacoes/:id", verifyToken, excluirInformacao);
 
-// Rota de configurações
-app.get("/configuracoes", buscarConfiguracoes);
+// Rota de configurações (Protegida)
+app.get("/configuracoes", verifyToken, buscarConfiguracoes);
 
 // Inicialização do servidor
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
-

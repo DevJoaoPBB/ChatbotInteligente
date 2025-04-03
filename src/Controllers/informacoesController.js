@@ -1,6 +1,4 @@
 import firebird from 'node-firebird';
-import { Dboptions } from '../Models/databaseModel.js';
-import { ExecutaSQL } from '../Models/queryModel.js';
 
 // Método para buscar todas as informações
 export const buscarInformacoes = (req, res) => {

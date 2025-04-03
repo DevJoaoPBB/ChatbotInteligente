@@ -1,6 +1,4 @@
 import firebird from 'node-firebird';
-import { Dboptions } from '../Models/databaseModel.js';
-import { ExecutaSQL } from '../Models/queryModel.js';
 
 export const buscarConfiguracoes = (req, res) => {
   const userEmail = req.headers['user-email']; // Alterado para obter o e-mail do cabeçalho

@@ -59,7 +59,7 @@ const Informacoes = () => {
     setModalAberto(true);
 
     // Focar no primeiro campo do modal
-    setTimeout(() => document.getElementsByName('palavraChave')[0]?.focus(), 0);
+    setTimeout(() => document.getElementsByName('palavrachave')[0]?.focus(), 0);
   }, []);
 
   const fecharModal = useCallback(() => {
@@ -72,7 +72,7 @@ const Informacoes = () => {
   };
 
   const salvarInformacao = async () => {
-    if (!novaInformacao.palavraChave.trim() || !novaInformacao.descricao.trim()) {
+    if (!novaInformacao.palavrachave.trim() || !novaInformacao.descricao.trim()) {
       toast.warning("Preencha todos os campos!");
       return;
     }
@@ -81,14 +81,14 @@ const Informacoes = () => {
       if (infoEditando) {
         const docRef = doc(db, localStorage.getItem("userEmail"), infoEditando.id);
         await updateDoc(docRef, {
-          palavraChave: novaInformacao.palavrachave,
+          palavrachave: novaInformacao.palavrachave,
           descricao: novaInformacao.descricao,
           usuario: userEmail,
         });
         toast.success("Informação atualizada com sucesso!");
       } else {
-        await addDoc(collection(db, "informacoes"), {
-          palavraChave: novaInformacao.palavraChave,
+        await addDoc(collection(db, localStorage.getItem("userEmail")), {
+          palavrachave: novaInformacao.palavrachave,
           descricao: novaInformacao.descricao,
           usuario: userEmail,
         });
@@ -106,7 +106,7 @@ const Informacoes = () => {
 
   const excluirInformacao = async (id) => {
     try {
-      await deleteDoc(doc(db, "informacoes", id));
+      await deleteDoc(doc(db, localStorage.getItem("userEmail"), id));
       toast.info("Informação excluída com sucesso!");
       fetchInformacoes();
     } catch (error) {
@@ -182,7 +182,7 @@ const Informacoes = () => {
           <div className="flex-1 overflow-auto px-6">
             <input
               type="text"
-              name="palavraChave"
+              name="palavrachave"
               value={novaInformacao.palavrachave}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-400 rounded-lg mb-3"
