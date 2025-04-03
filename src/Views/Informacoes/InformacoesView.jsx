@@ -3,6 +3,9 @@ import Modal from "react-modal";
 import { Trash2, Edit, User } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Estilos padrão
+import { db } from "../../Models/FirebaseConfigModel.js";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+
 
 
 Modal.setAppElement("#root");
@@ -10,7 +13,7 @@ Modal.setAppElement("#root");
 const Informacoes = () => {
   const [informacoes, setInformacoes] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
-  const [novaInformacao, setNovaInformacao] = useState({ palavraChave: "", descricao: "", usuario: "" });
+  const [novaInformacao, setNovaInformacao] = useState({ palavrachave: "", descricao: "", usuario: "" });
   const [infoEditando, setInfoEditando] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [userEmail, setUserEmail] = useState(null);
@@ -26,39 +29,22 @@ const Informacoes = () => {
     }
   }, []);
 
-  const API_URL = "http://35.209.172.168:7373"; // Pegando a URL da API do .env
-
-const fetchInformacoes = async () => {
-  try {
-    const userEmail = localStorage.getItem("userEmail");
-
-    if (!userEmail) {
-      toast.warning("Usuário não autenticado. Faça login novamente!"); // Alerta de aviso
-      return;
+  const fetchInformacoes = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, localStorage.getItem("userEmail")));
+      const dados = querySnapshot.docs.map((doc) => ({
+        id: doc.id, // ID do documento no Firestore
+        ...doc.data(),
+      }));
+      setInformacoes(dados);
+    } catch (error) {
+      console.error("Erro ao carregar informações:", error);
+      toast.error("Erro ao carregar informações.");
+    } finally {
+      setCarregando(false);
     }
-
-    const response = await fetch(`${API_URL}/informacoes`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "user-email": userEmail, // Passa o e-mail no cabeçalho
-      },
-    });
-
-    if (!response.ok) {
-      toast.error(`Erro ao buscar informações: ${response.statusText}`); // Alerta de erro
-      return;
-    }
-
-    const data = await response.json();
-    setInformacoes(data.data);
-  } catch (error) {
-    console.error("Erro ao carregar informações:", error);
-    toast.error("Erro ao carregar informações." || error.message); // Alerta de erro
-  } finally {
-    setCarregando(false);
-  }
-};
+  };
+  
 
 
   useEffect(() => {
@@ -68,7 +54,7 @@ const fetchInformacoes = async () => {
   const abrirModal = useCallback((info = null) => {
     setInfoEditando(info);
     setNovaInformacao(
-      info ? { palavraChave: info.PALAVRASCHAVE, descricao: info.INFORMACAO, usuario: info.USUARIO } : { palavraChave: "", descricao: "", usuario: "" }
+      info ? { palavrachave: info.palavrachave, descricao: info.descricao, usuario: info.usuario } : { palavrachave: "", descricao: "", usuario: "" }
     );
     setModalAberto(true);
 
@@ -87,60 +73,49 @@ const fetchInformacoes = async () => {
 
   const salvarInformacao = async () => {
     if (!novaInformacao.palavraChave.trim() || !novaInformacao.descricao.trim()) {
-      //alert("Preencha todos os campos!");
       toast.warning("Preencha todos os campos!");
-
       return;
     }
-
-    if (!userEmail) {
-      toast.warning("Usuário não autenticado. Faça login novamente!"); // Alerta de erro
-
-      return;
-    }
-
-    const method = infoEditando ? "PUT" : "POST";
-    const url = infoEditando
-      ? `http://localhost:7373/informacoes/${infoEditando.REGISTRO}`
-      : "http://localhost:7373/informacoes";
-
+  
     try {
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "user-email": userEmail, // Passa o e-mail no cabeçalho
-        },
-        body: JSON.stringify(novaInformacao),
-      });
-
-      if (!response.ok)
-        toast.error(`Erro ao salvar informação: ${response.statusText}`); // Alerta de erro
-
+      if (infoEditando) {
+        const docRef = doc(db, localStorage.getItem("userEmail"), infoEditando.id);
+        await updateDoc(docRef, {
+          palavraChave: novaInformacao.palavrachave,
+          descricao: novaInformacao.descricao,
+          usuario: userEmail,
+        });
+        toast.success("Informação atualizada com sucesso!");
+      } else {
+        await addDoc(collection(db, "informacoes"), {
+          palavraChave: novaInformacao.palavraChave,
+          descricao: novaInformacao.descricao,
+          usuario: userEmail,
+        });
+        toast.success("Informação adicionada com sucesso!");
+      }
+  
       fecharModal();
       fetchInformacoes();
-      //alert("Informação salva com sucesso!");
-      toast.success("Informação salva com sucesso!"); // Alerta de sucesso
     } catch (error) {
-      console.error("Erro:", error);
-      //alert(error.message || "Erro ao salvar informação");
-      toast.error("Erro ao salvar informação." || error.message);
+      console.error("Erro ao salvar informação:", error);
+      toast.error("Erro ao salvar informação.");
     }
   };
+  
 
   const excluirInformacao = async (id) => {
     try {
-      const response = await fetch(`http://localhost:7373/informacoes/${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error(`Erro ao excluir informação: ${response.statusText}`);
+      await deleteDoc(doc(db, "informacoes", id));
+      toast.info("Informação excluída com sucesso!");
       fetchInformacoes();
-      //alert("Informação excluída com sucesso!");
-      toast.info("Informação excluída com sucesso!"); // Alerta de informação
     } catch (error) {
-      console.error("Erro:", error);
-      toast.error("Erro ao excluir informação." || error.message); // Alerta de erro
+      console.error("Erro ao excluir informação:", error);
+      toast.error("Erro ao excluir informação.");
     }
   };
 
+  
   return (
     <div className="flex flex-col p-6 bg-gray-900 rounded-2xl h-full">
 
@@ -162,15 +137,15 @@ const fetchInformacoes = async () => {
             <tbody>
               {informacoes.map((info, index) => (
                 <tr
-                  key={info.REGISTRO}
+                  key={info.id}
                   className="even:bg-gray-200 hover:bg-blue-200 transition-all duration-800 cursor-pointer"
                 >
-                  <td className="py-4 px-4 font-bold text-right text-black">{info.REGISTRO}</td>
-                  <td className="py-4 px-4 text-left text-black">{info.PALAVRASCHAVE}</td>
-                  <td className="py-4 px-4 text-left text-black">{info.INFORMACAO}</td>
+                  <td className="py-4 px-4 font-bold text-right text-black">{info.id}</td>
+                  <td className="py-4 px-4 text-left text-black">{info.palavrachave}</td>
+                  <td className="py-4 px-4 text-left text-black">{info.descricao}</td>
                   <td className="py-4 px-4 text-black text-center flex justify-center gap-2">
                     <button
-                      onClick={() => excluirInformacao(info.REGISTRO)}
+                      onClick={() => excluirInformacao(info.id)}
                       className="bg-red-600 text-white px-5 py-1 rounded-2xl hover:bg-red-700 flex items-center gap-1"
                       aria-label="Excluir informação"
                     >
@@ -208,7 +183,7 @@ const fetchInformacoes = async () => {
             <input
               type="text"
               name="palavraChave"
-              value={novaInformacao.palavraChave}
+              value={novaInformacao.palavrachave}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-400 rounded-lg mb-3"
               placeholder="Palavra-chave"
