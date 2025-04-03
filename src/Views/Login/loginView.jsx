@@ -96,12 +96,7 @@ export default function Login() {
             </button>
           )}
         </form>
-        <p className="text-gray-400 mt-4">
-          Ainda não tem conta?{" "}
-          <a href="/cadastro" className="text-blue-400">
-            Crie agora, é grátis!
-          </a>
-        </p>
+
       </div>
 
       {/* Notificações */}
