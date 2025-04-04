@@ -6,8 +6,6 @@ import "react-toastify/dist/ReactToastify.css"; // Estilos padrão
 import { db } from "../../Models/FirebaseConfigModel.js";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
-
-
 Modal.setAppElement("#root");
 
 const Informacoes = () => {
@@ -24,8 +22,7 @@ const Informacoes = () => {
     if (Usuario) {
       setUserEmail(Usuario);
     } else {
-      toast.warning("Usuário não autenticado. Faça login novamente!"); // Alerta de aviso
-      // Aqui poderia redirecionar para a página de login, se necessário
+      toast.warning("Usuário não autenticado. Faça login novamente!");
     }
   }, []);
 
@@ -33,7 +30,7 @@ const Informacoes = () => {
     try {
       const querySnapshot = await getDocs(collection(db, localStorage.getItem("userEmail")));
       const dados = querySnapshot.docs.map((doc) => ({
-        id: doc.id, // ID do documento no Firestore
+        id: doc.id,
         ...doc.data(),
       }));
       setInformacoes(dados);
@@ -44,8 +41,6 @@ const Informacoes = () => {
       setCarregando(false);
     }
   };
-  
-
 
   useEffect(() => {
     fetchInformacoes();
@@ -57,8 +52,6 @@ const Informacoes = () => {
       info ? { palavrachave: info.palavrachave, descricao: info.descricao, usuario: info.usuario } : { palavrachave: "", descricao: "", usuario: "" }
     );
     setModalAberto(true);
-
-    // Focar no primeiro campo do modal
     setTimeout(() => document.getElementsByName('palavrachave')[0]?.focus(), 0);
   }, []);
 
@@ -102,7 +95,6 @@ const Informacoes = () => {
       toast.error("Erro ao salvar informação.");
     }
   };
-  
 
   const excluirInformacao = async (id) => {
     try {
@@ -115,23 +107,29 @@ const Informacoes = () => {
     }
   };
 
-  
   return (
-    <div className="flex flex-col p-6 bg-gray-900 rounded-2xl h-full">
+    <div className="flex flex-col p-4 sm:p-6 bg-gray-900 rounded-2xl h-full min-h-screen">
 
-      <h1 className="w-full rounded-2xl bg-blue-700 text-center p-1 text-2xl text-white font-semibold mb-10">Informações Cadastradas</h1>
-      <button onClick={() => abrirModal()} className="bg-green-700 text-white px-4 py-2 w-[20%] rounded-full hover:bg-green-800 mb-4">Adicionar Informação</button>
+      <h1 className="w-full rounded-2xl bg-blue-700 text-center p-2 text-xl sm:text-2xl text-white font-semibold mb-6 sm:mb-10">Informações Cadastradas</h1>
+      
+      <button 
+        onClick={() => abrirModal()} 
+        className="bg-green-700 text-white px-4 py-2 w-full sm:w-[20%] rounded-full hover:bg-green-800 mb-4 text-sm sm:text-base"
+      >
+        Adicionar Informação
+      </button>
+      
       {carregando ? (
         <p className="text-center text-gray-300">Carregando informações...</p>
       ) : (
         <div className="overflow-x-auto bg-white border border-white rounded-2xl">
           <table className="min-w-full text-white">
             <thead>
-              <tr className="bg-blue-700 py-4 px-4">
-                <th className="py-4 px-4">ID</th>
-                <th className="py-4 px-4">Palavras-Chave</th>
-                <th className="py-4 px-4">Descrição</th>
-                <th className="py-4 px-4 text-center">Ações</th>
+              <tr className="bg-blue-700">
+                <th className="py-3 px-2 sm:px-4 text-sm sm:text-base">ID</th>
+                <th className="py-3 px-2 sm:px-4 text-sm sm:text-base">Palavras-Chave</th>
+                <th className="py-3 px-2 sm:px-4 text-sm sm:text-base">Descrição</th>
+                <th className="py-3 px-2 sm:px-4 text-sm sm:text-base text-center">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -140,23 +138,31 @@ const Informacoes = () => {
                   key={info.id}
                   className="even:bg-gray-200 hover:bg-blue-200 transition-all duration-800 cursor-pointer"
                 >
-                  <td className="py-4 px-4 font-bold text-right text-black">{info.id}</td>
-                  <td className="py-4 px-4 text-left text-black">{info.palavrachave}</td>
-                  <td className="py-4 px-4 text-left text-black">{info.descricao}</td>
-                  <td className="py-4 px-4 text-black text-center flex justify-center gap-2">
+                  <td className="py-3 px-2 sm:px-4 font-bold text-right text-black text-xs sm:text-sm truncate max-w-[50px] sm:max-w-none">
+                    {info.id}
+                  </td>
+                  <td className="py-3 px-2 sm:px-4 text-left text-black text-xs sm:text-sm">
+                    {info.palavrachave}
+                  </td>
+                  <td className="py-3 px-2 sm:px-4 text-left text-black text-xs sm:text-sm">
+                    {info.descricao.length > 30 ? `${info.descricao.substring(0, 30)}...` : info.descricao}
+                  </td>
+                  <td className="py-3 px-2 sm:px-4 text-black flex justify-center gap-1 sm:gap-2">
                     <button
                       onClick={() => excluirInformacao(info.id)}
-                      className="bg-red-600 text-white px-5 py-1 rounded-2xl hover:bg-red-700 flex items-center gap-1"
+                      className="bg-red-600 text-white p-1 sm:px-3 sm:py-1 rounded-2xl hover:bg-red-700 flex items-center gap-1"
                       aria-label="Excluir informação"
                     >
-                      <Trash2 size={24} />
+                      <Trash2 size={18} className="sm:size-5" />
+                      <span className="hidden sm:inline">Excluir</span>
                     </button>
                     <button
                       onClick={() => abrirModal(info)}
-                      className="bg-yellow-500 text-white px-5 py-1 rounded-2xl hover:bg-yellow-600 flex items-center gap-1"
+                      className="bg-yellow-500 text-white p-1 sm:px-3 sm:py-1 rounded-2xl hover:bg-yellow-600 flex items-center gap-1"
                       aria-label="Editar informação"
                     >
-                      <Edit size={24} />
+                      <Edit size={18} className="sm:size-5" />
+                      <span className="hidden sm:inline">Editar</span>
                     </button>
                   </td>
                 </tr>
@@ -165,49 +171,56 @@ const Informacoes = () => {
           </table>
         </div>
       )}
+      
       <Modal
         isOpen={modalAberto}
         onRequestClose={fecharModal}
         contentLabel="Adicionar Informação"
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4"
       >
-        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
           {/* Cabeçalho */}
-          <div className="p-5">
-            <h2 className="text-xl bg-blue-600 rounded-lg text-center text-white font-bold">{infoEditando ? "Editar" : "Adicionar"} Informação</h2>
-            <h3 className="w-full p-2 border border-gray-300 font-bold text-gray-700 rounded-lg mt-4">Usuário: {userEmail}</h3>
+          <div className="p-3 sm:p-5">
+            <h2 className="text-lg sm:text-xl bg-blue-600 rounded-lg text-center text-white font-bold p-2">
+              {infoEditando ? "Editar" : "Adicionar"} Informação
+            </h2>
+            <h3 className="w-full p-2 border border-gray-300 font-bold text-gray-700 rounded-lg mt-2 sm:mt-4 text-sm sm:text-base">
+              Usuário: {userEmail}
+            </h3>
           </div>
 
           {/* Conteúdo com rolagem se necessário */}
-          <div className="flex-1 overflow-auto px-6">
+          <div className="flex-1 overflow-auto px-3 sm:px-6">
             <input
               type="text"
               name="palavrachave"
               value={novaInformacao.palavrachave}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-400 rounded-lg mb-3"
+              className="w-full p-2 border border-gray-400 rounded-lg mb-2 sm:mb-3 text-sm sm:text-base"
               placeholder="Palavra-chave"
             />
             <textarea
               name="descricao"
               value={novaInformacao.descricao}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-400 rounded-lg resize-none mb-4"
+              className="w-full p-2 border border-gray-400 rounded-lg resize-none mb-3 sm:mb-4 text-sm sm:text-base"
               placeholder="Descrição"
-              rows={8}
+              rows={6}
             />
           </div>
 
           {/* Rodapé fixo com botões */}
-          <div className="sticky bottom-0 p-4 flex justify-end gap-4 rounded-2xl">
+          <div className="sticky bottom-0 p-3 sm:p-4 bg-white flex justify-end gap-2 sm:gap-4 rounded-b-2xl border-t">
             <button
               onClick={fecharModal}
-              className="bg-red-600 text-white px-5 py-2 rounded-2xl hover:bg-red-800"
-            >Cancelar</button>
+              className="bg-red-600 text-white px-3 sm:px-5 py-1 sm:py-2 rounded-2xl hover:bg-red-800 text-sm sm:text-base"
+            >
+              Cancelar
+            </button>
 
             <button
               onClick={salvarInformacao}
-              className="bg-green-700 text-white px-5 py-2 rounded-2xl hover:bg-green-800"
+              className="bg-green-700 text-white px-3 sm:px-5 py-1 sm:py-2 rounded-2xl hover:bg-green-800 text-sm sm:text-base"
             >
               {infoEditando ? "Atualizar" : "Salvar"}
             </button>
@@ -215,9 +228,8 @@ const Informacoes = () => {
         </div>
       </Modal>
 
-
       <ToastContainer
-        position="top-right"
+        position="top-center"
         autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -229,22 +241,25 @@ const Informacoes = () => {
         theme="dark"
         toastStyle={{
           color: "white",
-          //fontWeight: "bold",
-          fontSize: "18px",
+          fontSize: "14px",
         }}
         toastClassName="custom-toast"
       />
+      
       <style>
         {`
-    .custom-toast .Toastify__toast-icon {
-      width: 36px !important;
-      height: 36px !important;
-    }
-  `}
+          .custom-toast .Toastify__toast-icon {
+            width: 24px !important;
+            height: 24px !important;
+          }
+          @media (min-width: 640px) {
+            .custom-toast .Toastify__toast-icon {
+              width: 36px !important;
+              height: 36px !important;
+            }
+          }
+        `}
       </style>
-
-
-
     </div>
   );
 };
