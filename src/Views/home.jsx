@@ -91,7 +91,7 @@ function Principal() {
             `flex items-center p-2 rounded-full transition-all duration-200 ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-11"}`}
           >
             <MessageSquareMore size={28} className="min-w-[28px]" />
-            {isOpen && <span className="ml-2 text-left">Chatbot</span>}
+            {isOpen && <span className="ml-2 text-left">Chatbot</span>}      
           </NavLink>
 
           <NavLink to="/configuracoes" className={({ isActive }) =>
