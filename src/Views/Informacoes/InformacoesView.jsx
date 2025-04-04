@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, User } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css"; // Estilos padrão
 import { db } from "../../Models/FirebaseConfigModel.js";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+
+
 
 Modal.setAppElement("#root");
 
@@ -16,12 +18,14 @@ const Informacoes = () => {
   const [carregando, setCarregando] = useState(true);
   const [userEmail, setUserEmail] = useState(null);
 
+  // Verificar se o usuário está logado
   useEffect(() => {
     const Usuario = localStorage.getItem("userEmail");
     if (Usuario) {
       setUserEmail(Usuario);
     } else {
-      toast.warning("Usuário não autenticado. Faça login novamente!");
+      toast.warning("Usuário não autenticado. Faça login novamente!"); // Alerta de aviso
+      // Aqui poderia redirecionar para a página de login, se necessário
     }
   }, []);
 
@@ -29,7 +33,7 @@ const Informacoes = () => {
     try {
       const querySnapshot = await getDocs(collection(db, localStorage.getItem("userEmail")));
       const dados = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
+        id: doc.id, // ID do documento no Firestore
         ...doc.data(),
       }));
       setInformacoes(dados);
@@ -40,6 +44,8 @@ const Informacoes = () => {
       setCarregando(false);
     }
   };
+  
+
 
   useEffect(() => {
     fetchInformacoes();
@@ -48,12 +54,12 @@ const Informacoes = () => {
   const abrirModal = useCallback((info = null) => {
     setInfoEditando(info);
     setNovaInformacao(
-      info
-        ? { palavrachave: info.palavrachave, descricao: info.descricao, usuario: info.usuario }
-        : { palavrachave: "", descricao: "", usuario: "" }
+      info ? { palavrachave: info.palavrachave, descricao: info.descricao, usuario: info.usuario } : { palavrachave: "", descricao: "", usuario: "" }
     );
     setModalAberto(true);
-    setTimeout(() => document.getElementsByName("palavrachave")[0]?.focus(), 0);
+
+    // Focar no primeiro campo do modal
+    setTimeout(() => document.getElementsByName('palavrachave')[0]?.focus(), 0);
   }, []);
 
   const fecharModal = useCallback(() => {
@@ -70,7 +76,7 @@ const Informacoes = () => {
       toast.warning("Preencha todos os campos!");
       return;
     }
-
+  
     try {
       if (infoEditando) {
         const docRef = doc(db, localStorage.getItem("userEmail"), infoEditando.id);
@@ -88,7 +94,7 @@ const Informacoes = () => {
         });
         toast.success("Informação adicionada com sucesso!");
       }
-
+  
       fecharModal();
       fetchInformacoes();
     } catch (error) {
@@ -96,6 +102,7 @@ const Informacoes = () => {
       toast.error("Erro ao salvar informação.");
     }
   };
+  
 
   const excluirInformacao = async (id) => {
     try {
@@ -108,19 +115,12 @@ const Informacoes = () => {
     }
   };
 
+  
   return (
     <div className="flex flex-col p-6 bg-gray-900 rounded-2xl h-full">
-      <h1 className="w-full rounded-2xl bg-blue-700 text-center p-1 text-2xl text-white font-semibold mb-10">
-        Informações Cadastradas
-      </h1>
 
-      <button
-        onClick={() => abrirModal()}
-        className="bg-green-700 text-white px-4 py-2 w-full sm:w-[20%] rounded-full hover:bg-green-800 mb-4"
-      >
-        Adicionar Informação
-      </button>
-
+      <h1 className="w-full rounded-2xl bg-blue-700 text-center p-1 text-2xl text-white font-semibold mb-10">Informações Cadastradas</h1>
+      <button onClick={() => abrirModal()} className="bg-green-700 text-white px-4 py-2 w-[20%] rounded-full hover:bg-green-800 mb-4">Adicionar Informação</button>
       {carregando ? (
         <p className="text-center text-gray-300">Carregando informações...</p>
       ) : (
@@ -135,7 +135,7 @@ const Informacoes = () => {
               </tr>
             </thead>
             <tbody>
-              {informacoes.map((info) => (
+              {informacoes.map((info, index) => (
                 <tr
                   key={info.id}
                   className="even:bg-gray-200 hover:bg-blue-200 transition-all duration-800 cursor-pointer"
@@ -143,7 +143,7 @@ const Informacoes = () => {
                   <td className="py-4 px-4 font-bold text-right text-black">{info.id}</td>
                   <td className="py-4 px-4 text-left text-black">{info.palavrachave}</td>
                   <td className="py-4 px-4 text-left text-black">{info.descricao}</td>
-                  <td className="py-4 px-4 text-black text-center flex flex-wrap justify-center gap-2">
+                  <td className="py-4 px-4 text-black text-center flex justify-center gap-2">
                     <button
                       onClick={() => excluirInformacao(info.id)}
                       className="bg-red-600 text-white px-5 py-1 rounded-2xl hover:bg-red-700 flex items-center gap-1"
@@ -165,23 +165,20 @@ const Informacoes = () => {
           </table>
         </div>
       )}
-
       <Modal
         isOpen={modalAberto}
         onRequestClose={fecharModal}
         contentLabel="Adicionar Informação"
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4"
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       >
-        <div className="bg-white rounded-2xl shadow-2xl max-w-[90%] w-full max-h-[90vh] flex flex-col">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col">
+          {/* Cabeçalho */}
           <div className="p-5">
-            <h2 className="text-xl bg-blue-600 rounded-lg text-center text-white font-bold">
-              {infoEditando ? "Editar" : "Adicionar"} Informação
-            </h2>
-            <h3 className="w-full p-2 border border-gray-300 font-bold text-gray-700 rounded-lg mt-4">
-              Usuário: {userEmail}
-            </h3>
+            <h2 className="text-xl bg-blue-600 rounded-lg text-center text-white font-bold">{infoEditando ? "Editar" : "Adicionar"} Informação</h2>
+            <h3 className="w-full p-2 border border-gray-300 font-bold text-gray-700 rounded-lg mt-4">Usuário: {userEmail}</h3>
           </div>
 
+          {/* Conteúdo com rolagem se necessário */}
           <div className="flex-1 overflow-auto px-6">
             <input
               type="text"
@@ -201,13 +198,13 @@ const Informacoes = () => {
             />
           </div>
 
-          <div className="sticky bottom-0 p-4 flex flex-wrap justify-end gap-4 rounded-2xl">
+          {/* Rodapé fixo com botões */}
+          <div className="sticky bottom-0 p-4 flex justify-end gap-4 rounded-2xl">
             <button
               onClick={fecharModal}
               className="bg-red-600 text-white px-5 py-2 rounded-2xl hover:bg-red-800"
-            >
-              Cancelar
-            </button>
+            >Cancelar</button>
+
             <button
               onClick={salvarInformacao}
               className="bg-green-700 text-white px-5 py-2 rounded-2xl hover:bg-green-800"
@@ -217,6 +214,7 @@ const Informacoes = () => {
           </div>
         </div>
       </Modal>
+
 
       <ToastContainer
         position="top-right"
@@ -231,18 +229,22 @@ const Informacoes = () => {
         theme="dark"
         toastStyle={{
           color: "white",
+          //fontWeight: "bold",
           fontSize: "18px",
         }}
         toastClassName="custom-toast"
       />
       <style>
         {`
-        .custom-toast .Toastify__toast-icon {
-          width: 36px !important;
-          height: 36px !important;
-        }
-        `}
+    .custom-toast .Toastify__toast-icon {
+      width: 36px !important;
+      height: 36px !important;
+    }
+  `}
       </style>
+
+
+
     </div>
   );
 };
