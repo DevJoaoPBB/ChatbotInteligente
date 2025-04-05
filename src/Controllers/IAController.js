@@ -54,7 +54,7 @@ async function buscarDadosUsuario(userEmail) {
 async function GeraTexto(prompt, userEmail) {
     try {
         const userData = await buscarDadosUsuario(userEmail);
-        const apiKey = await getApiKey();
+        const apiKey = await getApiKey(userEmail);
 
         // Inicializar a API do Gemini
         const genAI = new GoogleGenerativeAI(apiKey);
