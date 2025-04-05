@@ -4,28 +4,12 @@ import { Menu, Home, FileText, MessageSquareMore, LogOut, Settings } from "lucid
 
 function Principal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [showInfo, setShowInfo] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showInfo, setShowInfo] = useState(true); // Estado para controlar a exibição da div com informações
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); // Hook para capturar a rota atual
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setIsOpen(true);
-      } else {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Initialize on first render
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
+    // const authToken = localStorage.getItem("authToken");
     const userEmail = localStorage.getItem("userEmail");
     const userName = localStorage.getItem("userName");
     if (!userName && !userEmail) {
@@ -34,21 +18,17 @@ function Principal() {
   }, [navigate]);
 
   useEffect(() => {
+    // Quando a rota mudar, esconder a div de informações
     if (location.pathname !== "/home") {
       setShowInfo(false);
-    } else {
+    }
+    else
+      setShowInfo(true);
+
+    if (location.pathname == "/") {
       setShowInfo(true);
     }
-
-    if (location.pathname === "/") {
-      setShowInfo(true);
-    }
-
-    // Close sidebar when navigating on mobile
-    if (isMobile) {
-      setIsOpen(false);
-    }
-  }, [location, isMobile]);
+  }, [location]); // Dependência de 'location' para monitorar mudanças de rota
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -71,102 +51,78 @@ function Principal() {
     return "sua noite";
   };
 
+
+
   return (
-    <div className="h-screen bg-gray-100 flex flex-col md:flex-row">
-      {/* Mobile Header */}
-      <div className="md:hidden bg-gray-900 text-white p-3 flex justify-between items-center">
-        <button
-          className="p-2"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className="text-lg font-semibold">Menu</h1>
-        <div className="w-8"></div> {/* Spacer for balance */}
-      </div>
-
-      {/* Sidebar - Shows on desktop, toggles on mobile */}
+    <div className="h-screen bg-gray-600 flex">
+      {/* Menu Card */}
       <div
-        className={`bg-gray-900 text-white flex flex-col p-4 transition-all duration-300 ease-in-out overflow-hidden 
-          ${isOpen ? "w-64 fixed md:relative z-50 h-full" : "w-0 md:w-20"} 
-          ${isMobile && !isOpen ? "hidden" : ""}`}
-        style={{ minHeight: isMobile ? "calc(100vh - 56px)" : "100vh" }}
-      >
-        {!isMobile && (
-          <div className="flex items-center mb-6">
-            <button
-              className="flex gap-2 items-center justify-center text-white p-2"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              <Menu size={32} />
-              {isOpen && <span>Menu</span>}
-            </button>
-          </div>
-        )}
+        className={`bg-gray-900 shadow-lg rounded-2xl text-white flex flex-col p-4 transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "w-80" : "w-20"} mt-3 ml-3 mb-3`}>
+        <div className="flex items-center mb-6">
+          {isOpen && <h2 className="text-xl font-bold"></h2>}
+          <button
+  className={`flex items-center p-2 rounded-full transition-all duration-200 text-white ${isOpen ? "w-full" : "w-11"} justify-start`}
+  onClick={() => setIsOpen(!isOpen)}
+>
+  <Menu size={28} className="min-w-[28px]" />
+  {isOpen && <span className="ml-2 text-left">Menu</span>}
+</button>
 
-        <nav className="flex flex-col gap-3 flex-grow">
-          <NavLink 
-            to="/home" 
-            className={({ isActive }) =>
-              `flex items-center p-3 rounded-lg transition-all ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-12 justify-center"}`}
-            onClick={() => isMobile && setIsOpen(false)}
+        </div>
+        <nav className="flex flex-col gap-3">
+          <NavLink to="/home" className={({ isActive }) =>
+            `flex items-center p-2 rounded-full transition-all ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-11"}`}
           >
-            <Home size={24} className="min-w-[24px]" />
-            {isOpen && <span className="ml-3">Home</span>}
+            <Home size={28} className="min-w-[28px]" />
+            {isOpen && <span className="ml-2 text-left">Home</span>}
           </NavLink>
 
-          <NavLink 
-            to="/informacoes" 
-            className={({ isActive }) =>
-              `flex items-center p-3 rounded-lg transition-all ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-12 justify-center"}`}
-            onClick={() => isMobile && setIsOpen(false)}
+          <NavLink to="/informacoes" className={({ isActive }) =>
+            `flex items-center p-2 rounded-full transition-all duration-200 ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-11"}`}
           >
-            <FileText size={24} className="min-w-[24px]" />
-            {isOpen && <span className="ml-3">Informações</span>}
+            <FileText size={28} className="min-w-[28px]" />
+            {isOpen && <span className="ml-2 text-left">Informações</span>}
           </NavLink>
 
-          <NavLink 
-            to="/chatbot" 
-            className={({ isActive }) =>
-              `flex items-center p-3 rounded-lg transition-all ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-12 justify-center"}`}
-            onClick={() => isMobile && setIsOpen(false)}
+          <NavLink to="/chatbot" className={({ isActive }) =>
+            `flex items-center p-2 rounded-full transition-all duration-200 ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-11"}`}
           >
-            <MessageSquareMore size={24} className="min-w-[24px]" />
-            {isOpen && <span className="ml-3">Chatbot</span>}
+            <MessageSquareMore size={28} className="min-w-[28px]" />
+            {isOpen && <span className="ml-2 text-left">Chatbot</span>}
           </NavLink>
 
-          <NavLink 
-            to="/configuracoes" 
-            className={({ isActive }) =>
-              `flex items-center p-3 rounded-lg transition-all ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-12 justify-center"}`}
-            onClick={() => isMobile && setIsOpen(false)}
+          <NavLink to="/configuracoes" className={({ isActive }) =>
+            `flex items-center p-2 rounded-full transition-all duration-200 ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-11"}`}
           >
-            <Settings size={24} className="min-w-[24px]" />
-            {isOpen && <span className="ml-3">Configurações</span>}
+            <Settings size={28} className="min-w-[28px]" />
+            {isOpen && <span className="ml-2 text-left">Configurações</span>}
           </NavLink>
         </nav>
-
+        <div>
+      {/* Seu conteúdo do site */}
+    </div>
+        
         <button
           onClick={handleLogout}
-          className={`flex items-center p-3 rounded-lg hover:bg-gray-800 transition-all ${isOpen ? "w-full" : "w-12 justify-center"}`}
+          className={`mt-auto flex items-center p-2 rounded-full hover:bg-gray-800 transition-all duration-200 ${isOpen ? "w-full" : "w-11"}`}
         >
-          <LogOut size={24} className="min-w-[24px]" />
-          {isOpen && <span className="ml-3">Sair</span>}
+          <LogOut size={28} className="min-w-[28px]" />
+          {isOpen && <span className="ml-2 text-left">Sair</span>}
         </button>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 p-4 overflow-auto" style={{ 
-        height: isMobile ? "calc(100vh - 56px)" : "100vh",
-        marginLeft: isMobile ? 0 : isOpen ? "256px" : "80px"
-      }}>
+      {/* Content Card */}
+      <div className="flex-1 p-3 shadow-lg rounded-2xl">
         <Outlet />
 
         {showInfo && (
-          <div className="bg-blue-100 p-4 rounded-lg shadow-md mb-4">
-            <h1 className="text-lg font-semibold">{saudacao()}!</h1>
-            <p className="text-gray-700">Aqui estão algumas informações importantes para começar {turno()}.</p>
+          <div >
+            <div className="flex-1 bg-blue-200 p-4 rounded-2xl shadow-md mb-4">
+              <h1 className="text-xl font-semibold">{saudacao()}! </h1>
+              <p>Aqui estão algumas informações importantes para começar {turno()}.</p>
+            </div>
           </div>
+
         )}
       </div>
     </div>
