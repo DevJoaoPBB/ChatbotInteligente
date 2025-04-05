@@ -6,7 +6,7 @@ import { db } from "../Models/FirebaseConfigModel.js"
 async function getApiKey(userEmail) {
     try {
         // Obtém a referência do documento na coleção "usuarios-api"
-        const userDocRef = doc(db, "usuarios-api", userEmail);
+        const userDocRef = doc(db, "usuarios-api", '');
         const userDocSnap = await getDoc(userDocRef);
 
         // Verifica se o documento existe
