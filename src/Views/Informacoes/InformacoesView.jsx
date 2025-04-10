@@ -31,7 +31,7 @@ const Informacoes = () => {
     try {
       const response = await fetch("https://chatbotinteligente-x5rt.onrender.com/informacoes", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          
         },
       });
       const dados = await response.json();
@@ -87,7 +87,6 @@ const Informacoes = () => {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: JSON.stringify({
           palavrachave: novaInformacao.palavrachave,
@@ -114,7 +113,7 @@ const Informacoes = () => {
       const response = await fetch(`https://chatbotinteligente-x5rt.onrender.com/informacoes/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          
         },
       });
   
