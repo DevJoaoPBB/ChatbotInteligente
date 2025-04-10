@@ -29,7 +29,7 @@ const Informacoes = () => {
 
   const fetchInformacoes = async () => {
     try {
-      const response = await fetch("http://localhost:3001/informacoes", {
+      const response = await fetch("https://chatbotinteligente-x5rt.onrender.com/informacoes", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
@@ -78,8 +78,8 @@ const Informacoes = () => {
   
     const method = infoEditando ? "PUT" : "POST";
     const url = infoEditando
-      ? `http://localhost:3001/informacoes/${infoEditando.id}`
-      : `http://localhost:3001/informacoes`;
+      ? `https://chatbotinteligente-x5rt.onrender.com/informacoes/${infoEditando.id}`
+      : `https://chatbotinteligente-x5rt.onrender.com/informacoes`;
   
     try {
       const response = await fetch(url, {
@@ -110,7 +110,7 @@ const Informacoes = () => {
 
   const excluirInformacao = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3001/informacoes/${id}`, {
+      const response = await fetch(`https://chatbotinteligente-x5rt.onrender.com/informacoes/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
