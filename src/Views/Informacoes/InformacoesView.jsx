@@ -35,6 +35,7 @@ const Informacoes = () => {
         },
       });
       const dados = await response.json();
+      console.log("Resposta da API:", dados); // 👀 Aqui!
       setInformacoes(dados);
     } catch (error) {
       console.error("Erro ao buscar informações:", error);
