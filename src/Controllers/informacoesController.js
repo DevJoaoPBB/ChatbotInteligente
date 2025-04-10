@@ -1,142 +1,95 @@
-import firebird from 'node-firebird';
-
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { collection, doc, getDocs, getDoc } from "firebase/firestore";
+import { db } from "../Models/FirebaseConfigModel.js"
 // Método para buscar todas as informações
-export const buscarInformacoes = (req, res) => {
-  const userEmail = req.headers['user-email']; // Alterado para obter o e-mail do cabeçalho
- 
+
+export const buscarInformacoes = async (req, res) => {
+  const userEmail = req.headers['user-email'];
+
   if (!userEmail) {
     return res.status(400).json({ success: false, message: 'Usuário não autenticado.' });
   }
 
-const ssql = `SELECT 
-              T001_NR_CODIGO AS REGISTRO,
-              T001_CA_PALAVRA_CHAVE AS PALAVRASCHAVE,
-              T001_CA_DESCRICAO AS INFORMACAO,
-              T002_CA_USUARIO AS USUARIO
-              FROM T001_INFORMACOES
-              WHERE T002_CA_USUARIO = ?`;
+  try {
+    const colRef = collection(db, userEmail); // Coleção com o nome do e-mail
+    const snapshot = await getDocs(colRef);
 
-
-  firebird.attach(Dboptions, function (err, db) {
-    if (err) {
-      return res.status(500).json({ success: false, message: 'Erro ao conectar ao banco', error: err });
+    if (snapshot.empty) {
+      return res.status(404).json({ success: false, message: 'Nenhuma informação encontrada.' });
     }
 
-    db.query(ssql, [userEmail], function (err, result) {
-      db.detach(function (detachErr) {
-        if (detachErr) {
-          console.error('Erro ao desanexar o banco:', detachErr);
-        }
-      });
-
-      if (err) {
-        return res.status(500).json({ success: false, message: 'Erro ao buscar informações', error: err });
-      }
-
-      res.json({ success: true, data: result });
+    const dados = [];
+    snapshot.forEach(doc => {
+      dados.push({ id: doc.id, ...doc.data() });
     });
-  });
+
+    return res.json({ success: true, data: dados });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Erro ao buscar informações', error: error.message });
+  }
 };
 
 
-export const adicionarInformacao = (req, res) => {
+export const adicionarInformacao = async (req, res) => {
   const { palavraChave, descricao } = req.body;
-  const userEmail = req.headers['user-email']; 
-
-  //console.log("Dados recebidos:", { palavraChave, descricao, userEmail });
+  const userEmail = req.headers['user-email'];
 
   if (!userEmail || !palavraChave || !descricao) {
-    console.error("Erro: Campos obrigatórios ausentes.");
     return res.status(400).json({ success: false, message: 'Campos obrigatórios faltando.' });
   }
 
-  const ssql = `
-    INSERT INTO T001_INFORMACOES (T001_CA_PALAVRA_CHAVE, T001_CA_DESCRICAO, T002_CA_USUARIO) 
-    VALUES (?, ?, ?)
-  `;
-
-  firebird.attach(Dboptions, function (err, db) {
-    if (err) {
-      //console.error("Erro ao conectar ao banco:", err);
-      return res.status(500).json({ success: false, message: 'Erro ao conectar ao banco', error: err });
-    }
-
-    db.query(ssql, [palavraChave, descricao, userEmail], function (err, result) {
-      db.detach();
-      if (err) {
-        //console.error("Erro ao adicionar informação:", err);
-        return res.status(500).json({ success: false, message: 'Erro ao adicionar informação', error: err });
-      }
-
-      //console.log("Informação adicionada com sucesso!");
-
-         res.json({ success: true, message: 'Informação adicionada com sucesso' });
+  try {
+    await addDoc(collection(db, userEmail), {
+      PALAVRASCHAVE: palavraChave,
+      INFORMACAO: descricao,
+      USUARIO: userEmail,
     });
-  });
+
+    return res.json({ success: true, message: 'Informação adicionada com sucesso' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Erro ao adicionar informação', error: error.message });
+  }
 };
 
 // Método para editar uma informação existente
-export const editarInformacao = (req, res) => {
+export const editarInformacao = async (req, res) => {
   const { id } = req.params;
   const { palavraChave, descricao } = req.body;
+  const userEmail = req.headers['user-email'];
 
-  if (!id || !palavraChave || !descricao) {
+  if (!userEmail || !id || !palavraChave || !descricao) {
     return res.status(400).json({ success: false, message: 'Campos obrigatórios faltando.' });
   }
 
-  const ssql = `
-    UPDATE T001_INFORMACOES 
-    SET T001_CA_PALAVRA_CHAVE = ?, T001_CA_DESCRICAO = ? 
-    WHERE T001_NR_CODIGO = ?
-  `;
-
-  firebird.attach(Dboptions, function (err, db) {
-    if (err) {
-      return res.status(500).json({ success: false, message: 'Erro ao conectar ao banco', error: err });
-    }
-
-    db.execute(ssql, [palavraChave, descricao, id], function (err, result) {
-      db.detach();
-      if (err) {
-        return res.status(500).json({ success: false, message: 'Erro ao editar informação', error: err });
-      }
-
-      if (result === 0) {
-        return res.status(404).json({ success: false, message: 'Informação não encontrada ou não foi atualizada.' });
-      }
-
-      res.json({ success: true, message: 'Informação editada com sucesso' });
+  try {
+    const docRef = doc(db, userEmail, id);
+    await updateDoc(docRef, {
+      PALAVRASCHAVE: palavraChave,
+      INFORMACAO: descricao,
     });
-  });
+
+    return res.json({ success: true, message: 'Informação atualizada com sucesso' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Erro ao atualizar informação', error: error.message });
+  }
 };
 
 
 // Método para excluir uma informação
-export const excluirInformacao = (req, res) => {
+export const excluirInformacao = async (req, res) => {
   const { id } = req.params;
+  const userEmail = req.headers['user-email'];
 
-  if (!id) {
-    return res.status(400).json({ success: false, message: 'ID da informação não fornecido.' });
+  if (!userEmail || !id) {
+    return res.status(400).json({ success: false, message: 'ID da informação ou usuário não fornecido.' });
   }
 
-  const ssql = `DELETE FROM T001_INFORMACOES WHERE T001_NR_CODIGO = ?`;
+  try {
+    const docRef = doc(db, userEmail, id);
+    await deleteDoc(docRef);
 
-  firebird.attach(Dboptions, function (err, db) {
-    if (err) {
-      return res.status(500).json({ success: false, message: 'Erro ao conectar ao banco', error: err });
-    }
-
-    db.execute(ssql, [id], function (err, result) {
-      db.detach();
-      if (err) {
-        return res.status(500).json({ success: false, message: 'Erro ao excluir informação', error: err });
-      }
-
-      if (result === 0) {
-        return res.status(404).json({ success: false, message: 'Informação não encontrada ou não foi excluída.' });
-      }
-
-      res.json({ success: true, message: 'Informação excluída com sucesso' });
-    });
-  });
+    return res.json({ success: true, message: 'Informação excluída com sucesso' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Erro ao excluir informação', error: error.message });
+  }
 };
