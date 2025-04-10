@@ -3,8 +3,6 @@ import Modal from "react-modal";
 import { Trash2, Edit, User } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Estilos padrão
-import { db } from "../../Models/FirebaseConfigModel.js";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
 
 
@@ -31,14 +29,15 @@ const Informacoes = () => {
 
   const fetchInformacoes = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, localStorage.getItem("userEmail")));
-      const dados = querySnapshot.docs.map((doc) => ({
-        id: doc.id, // ID do documento no Firestore
-        ...doc.data(),
-      }));
+      const response = await fetch("http://localhost:3001/informacoes", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      const dados = await response.json();
       setInformacoes(dados);
     } catch (error) {
-      console.error("Erro ao carregar informações:", error);
+      console.error("Erro ao buscar informações:", error);
       toast.error("Erro ao carregar informações.");
     } finally {
       setCarregando(false);
@@ -77,24 +76,28 @@ const Informacoes = () => {
       return;
     }
   
-    try {
-      if (infoEditando) {
-        const docRef = doc(db, localStorage.getItem("userEmail"), infoEditando.id);
-        await updateDoc(docRef, {
-          palavrachave: novaInformacao.palavrachave,
-          descricao: novaInformacao.descricao,
-          usuario: userEmail,
-        });
-        toast.success("Informação atualizada com sucesso!");
-      } else {
-        await addDoc(collection(db, localStorage.getItem("userEmail")), {
-          palavrachave: novaInformacao.palavrachave,
-          descricao: novaInformacao.descricao,
-          usuario: userEmail,
-        });
-        toast.success("Informação adicionada com sucesso!");
-      }
+    const method = infoEditando ? "PUT" : "POST";
+    const url = infoEditando
+      ? `http://localhost:3001/informacoes/${infoEditando.id}`
+      : `http://localhost:3001/informacoes`;
   
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          palavrachave: novaInformacao.palavrachave,
+          descricao: novaInformacao.descricao,
+          usuario: userEmail,
+        }),
+      });
+  
+      if (!response.ok) throw new Error("Erro ao salvar");
+  
+      toast.success(infoEditando ? "Informação atualizada!" : "Informação adicionada!");
       fecharModal();
       fetchInformacoes();
     } catch (error) {
@@ -103,10 +106,19 @@ const Informacoes = () => {
     }
   };
   
+  
 
   const excluirInformacao = async (id) => {
     try {
-      await deleteDoc(doc(db, localStorage.getItem("userEmail"), id));
+      const response = await fetch(`http://localhost:3001/informacoes/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+  
+      if (!response.ok) throw new Error("Erro ao excluir");
+  
       toast.info("Informação excluída com sucesso!");
       fetchInformacoes();
     } catch (error) {
@@ -114,7 +126,7 @@ const Informacoes = () => {
       toast.error("Erro ao excluir informação.");
     }
   };
-
+  
   
   return (
     <div className="flex flex-col p-6 bg-gray-900 rounded-2xl h-full">
