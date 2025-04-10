@@ -51,10 +51,10 @@ app.post("/chatbot", async (req, res) => {
 });
 
 // Rotas de informações (Protegidas por autenticação)
-app.get("/informacoes", verifyToken, buscarInformacoes);
-app.post("/informacoes", verifyToken, adicionarInformacao);
-app.put("/informacoes/:id", verifyToken, editarInformacao);
-app.delete("/informacoes/:id", verifyToken, excluirInformacao);
+app.get("/informacoes", buscarInformacoes);
+app.post("/informacoes", adicionarInformacao);
+app.put("/informacoes/:id", editarInformacao);
+app.delete("/informacoes/:id", excluirInformacao);
 
 // Rota de configurações (Protegida)
 app.get("/configuracoes", verifyToken, buscarConfiguracoes);
