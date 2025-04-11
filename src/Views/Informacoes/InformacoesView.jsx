@@ -84,6 +84,7 @@ const Informacoes = () => {
         method,
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: JSON.stringify({
           palavrachave: novaInformacao.palavrachave,
@@ -109,6 +110,9 @@ const Informacoes = () => {
     try {
       const response = await fetch(`https://chatbotinteligente-x5rt.onrender.com/informacoes/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
       });
   
       if (!response.ok) throw new Error("Erro ao excluir");
