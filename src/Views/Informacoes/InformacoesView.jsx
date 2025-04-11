@@ -30,9 +30,6 @@ const Informacoes = () => {
   const fetchInformacoes = async () => {
     try {
       const response = await fetch("https://chatbotinteligente-x5rt.onrender.com/informacoes", {
-        headers: {
-          
-        },
       });
       const dados = await response.json();
       console.log("Resposta da API:", dados); // 👀 Aqui!
@@ -112,9 +109,6 @@ const Informacoes = () => {
     try {
       const response = await fetch(`https://chatbotinteligente-x5rt.onrender.com/informacoes/${id}`, {
         method: "DELETE",
-        headers: {
-          
-        },
       });
   
       if (!response.ok) throw new Error("Erro ao excluir");
