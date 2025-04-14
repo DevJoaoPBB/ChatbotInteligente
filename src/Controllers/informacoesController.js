@@ -63,8 +63,8 @@ export const editarInformacao = async (req, res) => {
   }
 
   try {
-    const docRef = doc(db, userEmail, id);
-    await addDoc(docRef, {
+    const docRef = doc(db, userEmail, id); // Referência do documento a ser atualizado
+    await updateDoc(docRef, { // Utilizando updateDoc para atualizar o documento
       PALAVRASCHAVE: palavraChave,
       INFORMACAO: descricao,
     });
