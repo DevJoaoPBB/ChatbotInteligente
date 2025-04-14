@@ -23,22 +23,37 @@ const Informacoes = () => {
     }
   }, []);
 
-  const fetchInformacoes = async () => {
+  // Exemplo de função para buscar informações
+  const buscarInformacoes = async () => {
     try {
-      const response = await fetch("https://chatbotinteligente-x5rt.onrender.com/informacoes");
-      const dados = await response.json();
-      setInformacoes(dados);
+      const response = await fetch("https://chatbotinteligente-x5rt.onrender.com/informacoes", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "user-email": userEmail // ✅ aqui é onde corrige
+        }
+      });
+
+      const resultado = await response.json();
+
+      if (!resultado.success) {
+        console.error("Erro ao buscar informações:", resultado.message);
+      } else {
+        setInformacoes(resultado.data);
+      }
     } catch (error) {
-      console.error("Erro ao buscar informações:", error);
-      toast.error("Erro ao carregar informações.");
-    } finally {
-      setCarregando(false);
+      console.error("Erro geral ao buscar informações:", error);
     }
   };
 
+
   useEffect(() => {
-    fetchInformacoes();
-  }, []);
+    if (userEmail) {
+      buscarInformacoes();
+      setCarregando(false);
+    }
+  }, [userEmail]);
+
 
   const abrirModal = useCallback((info = null) => {
     setInfoEditando(info);
@@ -74,19 +89,22 @@ const Informacoes = () => {
     try {
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "user-email": userEmail,
+        },
         body: JSON.stringify({
           palavrachave: novaInformacao.palavrachave,
           descricao: novaInformacao.descricao,
-          usuario: userEmail,
         }),
+
       });
 
       if (!response.ok) throw new Error("Erro ao salvar");
 
       toast.success(infoEditando ? "Informação atualizada!" : "Informação adicionada!");
       fecharModal();
-      fetchInformacoes();
+      buscarInformacoes();
     } catch (error) {
       console.error("Erro ao salvar informação:", error);
       toast.error("Erro ao salvar informação.");
@@ -97,12 +115,17 @@ const Informacoes = () => {
     try {
       const response = await fetch(`https://chatbotinteligente-x5rt.onrender.com/informacoes/${id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "user-email": userEmail
+        }
       });
+
 
       if (!response.ok) throw new Error("Erro ao excluir");
 
       toast.info("Informação excluída com sucesso!");
-      fetchInformacoes();
+      buscarInformacoes();
     } catch (error) {
       console.error("Erro ao excluir informação:", error);
       toast.error("Erro ao excluir informação.");
@@ -236,5 +259,6 @@ const Informacoes = () => {
     </div>
   );
 };
+
 
 export default Informacoes;

@@ -70,16 +70,6 @@ function Chatbot() {
     }
   }, [messages, IDConversa]);
 
-  const handleFileChange = (event) => {
-    if (event.target.files.length > 0) {
-      setFile(event.target.files[0]);
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setFile(null);
-  };
-
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
