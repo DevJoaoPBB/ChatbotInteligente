@@ -30,19 +30,29 @@ const Informacoes = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "user-email": userEmail // ✅ aqui é onde corrige
+          "user-email": userEmail
         }
       });
-
+  
       const resultado = await response.json();
-
+  
       if (!resultado.success) {
         console.error("Erro ao buscar informações:", resultado.message);
-      } else {
-        setInformacoes(resultado.data);
+        return;
       }
+  
+      // Map the data to ensure consistent field names
+      const formattedData = resultado.data.map(item => ({
+        id: item.id,
+        palavrachave: item.palavrachave || item.PALAVRASCHAVE || '',
+        descricao: item.descricao || item.INFORMACAO || '',
+        usuario: item.usuario || item.USUARIO || ''
+      }));
+  
+      setInformacoes(formattedData);
     } catch (error) {
       console.error("Erro geral ao buscar informações:", error);
+      toast.error("Erro ao buscar informações");
     }
   };
 
@@ -80,36 +90,55 @@ const Informacoes = () => {
       toast.warning("Preencha todos os campos!");
       return;
     }
-
+  
+    if (!userEmail) {
+      toast.error("Usuário não autenticado!");
+      return;
+    }
+  
     const method = infoEditando ? "PUT" : "POST";
     const url = infoEditando
       ? `https://chatbotinteligente-x5rt.onrender.com/informacoes/${infoEditando.id}`
       : `https://chatbotinteligente-x5rt.onrender.com/informacoes`;
-
+  
     try {
+      console.log('Sending request:', { 
+        method, 
+        url,
+        body: {
+          palavraChave: novaInformacao.palavrachave,
+          descricao: novaInformacao.descricao
+        }
+      });
+  
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          "user-email": userEmail,
+          "user-email": userEmail
         },
         body: JSON.stringify({
-          palavrachave: novaInformacao.palavrachave,
-          descricao: novaInformacao.descricao,
+          palavraChave: novaInformacao.palavrachave,
+          descricao: novaInformacao.descricao
         }),
-
       });
-
-      if (!response.ok) throw new Error("Erro ao salvar");
-
+  
+      const responseData = await response.json();
+      console.log('Response:', responseData);
+  
+      if (!response.ok) {
+        throw new Error(responseData.message || "Erro ao salvar");
+      }
+  
       toast.success(infoEditando ? "Informação atualizada!" : "Informação adicionada!");
       fecharModal();
       buscarInformacoes();
     } catch (error) {
-      console.error("Erro ao salvar informação:", error);
-      toast.error("Erro ao salvar informação.");
+      console.error("Full error:", error);
+      toast.error(`Erro ao salvar informação: ${error.message}`);
     }
   };
+  
 
   const excluirInformacao = async (id) => {
     try {
