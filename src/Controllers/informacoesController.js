@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { collection, doc, getDocs, getDoc } from "firebase/firestore";
 import { db } from "../Models/FirebaseConfigModel.js"
-import { addDoc, deleteDoc } from "firebase/firestore";
+import { addDoc, deleteDoc,updateDoc} from "firebase/firestore";
 // Método para buscar todas as informações
 
 export const buscarInformacoes = async (req, res) => {
