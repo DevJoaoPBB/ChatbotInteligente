@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, Printer} from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -210,7 +210,15 @@ const Informacoes = () => {
                       className="bg-yellow-500 text-white px-5 py-1 rounded-2xl hover:bg-yellow-600 flex items-center gap-1"
                       aria-label="Editar informação"
                     >
+                    
                       <Edit size={24} />
+                    </button>
+                    <button
+                      onClick={() => excluirInformacao(info.id)}
+                      className="bg-black text-white px-5 py-1 rounded-2xl hover:bg-red-700 flex items-center gap-1"
+                      aria-label="Imprimir"
+                    >
+                      <Printer size={24} />
                     </button>
                   </td>
                 </tr>
