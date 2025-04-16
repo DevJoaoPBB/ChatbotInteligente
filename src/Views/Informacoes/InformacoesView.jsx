@@ -263,10 +263,10 @@ const Informacoes = () => {
                   key={info.id}
                   className="even:bg-gray-200 hover:bg-blue-200 transition-all duration-800 cursor-pointer"
                 >
-                  <td className="py-4 px-4 font-bold text-right text-black">{"******"}</td>
-                  <td className="py-4 px-4 text-left text-black">{info.palavrachave}</td>
-                  <td className="py-4 px-4 text-left text-black max-w-[300px] max-h-[100px] overflow-auto">
-                    <div className="whitespace-pre-wrap break-words">
+                  <td className="px-2 font-bold text-right text-black">{info.id}</td>
+                  <td className="px-4 max-h-20 w-60 text-left text-black">{info.palavrachave}</td>
+                  <td className="text-left text-black max-h-32 overflow-y-auto whitespace-pre-wrap">
+                  <div className="max-h-24 h-24 text-left overflow-y-auto">
                       {info.descricao}
                     </div>
                   </td>
@@ -277,7 +277,7 @@ const Informacoes = () => {
                       className="bg-red-600 text-white px-5 py-1 rounded-2xl hover:bg-red-700 flex items-center gap-1"
                       aria-label="Excluir informação"
                     >
-                      <Trash2 size={24} />
+                      <Trash2 size={28} />
                     </button>
                     <button
                       onClick={() => abrirModal(info)}
