@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
-import { Trash2, Edit, Printer} from "lucide-react";
+import { Trash2, Edit, Printer } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 Modal.setAppElement("#root");
 
@@ -33,14 +35,14 @@ const Informacoes = () => {
           "user-email": userEmail
         }
       });
-  
+
       const resultado = await response.json();
-  
+
       if (!resultado.success) {
         console.error("Erro ao buscar informações:", resultado.message);
         return;
       }
-  
+
       // Map the data to ensure consistent field names
       const formattedData = resultado.data.map(item => ({
         id: item.id,
@@ -48,7 +50,7 @@ const Informacoes = () => {
         descricao: item.descricao || item.INFORMACAO || '',
         usuario: item.usuario || item.USUARIO || ''
       }));
-  
+
       setInformacoes(formattedData);
     } catch (error) {
       console.error("Erro geral ao buscar informações:", error);
@@ -90,27 +92,27 @@ const Informacoes = () => {
       toast.warning("Preencha todos os campos!");
       return;
     }
-  
+
     if (!userEmail) {
       toast.error("Usuário não autenticado!");
       return;
     }
-  
+
     const method = infoEditando ? "PUT" : "POST";
     const url = infoEditando
       ? `https://chatbotinteligente-x5rt.onrender.com/informacoes/${infoEditando.id}`
       : `https://chatbotinteligente-x5rt.onrender.com/informacoes`;
-  
+
     try {
-      console.log('Sending request:', { 
-        method, 
+      console.log('Sending request:', {
+        method,
         url,
         body: {
           palavraChave: novaInformacao.palavrachave,
           descricao: novaInformacao.descricao
         }
       });
-  
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -122,14 +124,14 @@ const Informacoes = () => {
           descricao: novaInformacao.descricao
         }),
       });
-  
+
       const responseData = await response.json();
       console.log('Response:', responseData);
-  
+
       if (!response.ok) {
         throw new Error(responseData.message || "Erro ao salvar");
       }
-  
+
       toast.success(infoEditando ? "Informação atualizada!" : "Informação adicionada!");
       fecharModal();
       buscarInformacoes();
@@ -138,7 +140,7 @@ const Informacoes = () => {
       toast.error(`Erro ao salvar informação: ${error.message}`);
     }
   };
-  
+
 
   const excluirInformacao = async (id) => {
     try {
@@ -160,6 +162,73 @@ const Informacoes = () => {
       toast.error("Erro ao excluir informação.");
     }
   };
+
+  //GERAÇÃO DO PDF
+  const gerarPDF = (info) => {
+    const doc = new jsPDF();
+  
+    // Definir o caminho para o logo
+    const logoUrl = 'src/Views/Login/icone.png'; // Altere isso para o caminho do seu logo
+  
+    // Definir as posições
+    const marginTop = 10;
+    const marginLeft = 10;
+    const logoWidth = 30;
+    const logoHeight = 30;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const tableWidth = pageWidth - 2 * marginLeft; // Largura da tabela igual à largura da página (menos as margens)
+    const headerHeight = 25; // Altura do cabeçalho
+  
+    // Cabeçalho com logo e título dentro de um quadro
+    doc.setDrawColor(52, 73, 94); // Cor da borda do quadro
+    doc.setFillColor(236, 240, 241); // Cor de fundo do quadro
+    doc.rect(marginLeft, marginTop, tableWidth, headerHeight, 'F'); // Desenha o quadro com a mesma largura da tabela
+  
+    // Inserir logo
+    doc.addImage(logoUrl, 'PNG', marginLeft + 5, marginTop -2, logoWidth, logoHeight);
+  
+    // Inserir título dentro do quadro
+    const titulo = "Cadastro de Informações";
+    doc.setTextColor(52, 73, 94); // Cor do texto do título
+    const textWidth = doc.getTextWidth(titulo);
+    const titleX = marginLeft + logoWidth + 10; // Coloca o título à direita do logo
+    const titleY = marginTop + 15; // Ajusta a posição vertical do título
+  
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(titulo, titleX, titleY);
+  
+    // Adicionando a tabela
+    autoTable(doc, {
+      startY: marginTop + headerHeight + 5,
+      head: [["Campo", "Valor"]],
+      body: [
+        ["ID", "********"],
+        ["Palavra-chave", info.palavrachave],
+        ["Descrição", info.descricao],
+        ["Usuário", info.usuario],
+      ],
+      theme: "grid",
+      headStyles: {
+        fillColor: [52, 73, 94],
+        textColor: 255,
+        halign: "center",
+      },
+      styles: {
+        fontSize: 12,
+      },
+      margin: { left: marginLeft, right: marginLeft }, // <-- Essencial para alinhar com o cabeçalho
+      tableWidth: tableWidth,
+    });
+    
+  
+    // Gera um Blob e abre em nova aba
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl, "_blank");
+  };
+  
+  //FIM GERAÇÃO PDF
 
   return (
     <div className="flex flex-col p-6 bg-gray-900 rounded-2xl h-full">
@@ -194,7 +263,7 @@ const Informacoes = () => {
                   key={info.id}
                   className="even:bg-gray-200 hover:bg-blue-200 transition-all duration-800 cursor-pointer"
                 >
-                  <td className="py-4 px-4 font-bold text-right text-black">{info.id}</td>
+                  <td className="py-4 px-4 font-bold text-right text-black">{"******"}</td>
                   <td className="py-4 px-4 text-left text-black">{info.palavrachave}</td>
                   <td className="py-4 px-4 text-left text-black">{info.descricao}</td>
                   <td className="py-4 px-4 text-black text-center flex justify-center gap-2">
@@ -210,12 +279,12 @@ const Informacoes = () => {
                       className="bg-yellow-500 text-white px-5 py-1 rounded-2xl hover:bg-yellow-600 flex items-center gap-1"
                       aria-label="Editar informação"
                     >
-                    
+
                       <Edit size={24} />
                     </button>
                     <button
-                      onClick={() => excluirInformacao(info.id)}
-                      className="bg-black text-white px-5 py-1 rounded-2xl hover:bg-red-700 flex items-center gap-1"
+                      onClick={() => gerarPDF(info)}
+                      className="bg-white text-black px-5 py-1 border border-gray-500 rounded-2xl hover:bg-gray-200 flex items-center gap-1"
                       aria-label="Imprimir"
                     >
                       <Printer size={24} />
