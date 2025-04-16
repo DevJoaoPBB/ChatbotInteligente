@@ -166,10 +166,10 @@ const Informacoes = () => {
   //GERAÇÃO DO PDF
   const gerarPDF = (info) => {
     const doc = new jsPDF();
-  
+
     // Definir o caminho para o logo
     const logoUrl = 'src/Views/Login/icone.png'; // Altere isso para o caminho do seu logo
-  
+
     // Definir as posições
     const marginTop = 10;
     const marginLeft = 10;
@@ -178,26 +178,26 @@ const Informacoes = () => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const tableWidth = pageWidth - 2 * marginLeft; // Largura da tabela igual à largura da página (menos as margens)
     const headerHeight = 25; // Altura do cabeçalho
-  
+
     // Cabeçalho com logo e título dentro de um quadro
     doc.setDrawColor(52, 73, 94); // Cor da borda do quadro
     doc.setFillColor(236, 240, 241); // Cor de fundo do quadro
     doc.rect(marginLeft, marginTop, tableWidth, headerHeight, 'F'); // Desenha o quadro com a mesma largura da tabela
-  
+
     // Inserir logo
-    doc.addImage(logoUrl, 'PNG', marginLeft + 5, marginTop -2, logoWidth, logoHeight);
-  
+    doc.addImage(logoUrl, 'PNG', marginLeft + 5, marginTop - 2, logoWidth, logoHeight);
+
     // Inserir título dentro do quadro
     const titulo = "Cadastro de Informações";
     doc.setTextColor(52, 73, 94); // Cor do texto do título
     const textWidth = doc.getTextWidth(titulo);
     const titleX = marginLeft + logoWidth + 10; // Coloca o título à direita do logo
     const titleY = marginTop + 15; // Ajusta a posição vertical do título
-  
+
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text(titulo, titleX, titleY);
-  
+
     // Adicionando a tabela
     autoTable(doc, {
       startY: marginTop + headerHeight + 5,
@@ -220,14 +220,14 @@ const Informacoes = () => {
       margin: { left: marginLeft, right: marginLeft }, // <-- Essencial para alinhar com o cabeçalho
       tableWidth: tableWidth,
     });
-    
-  
+
+
     // Gera um Blob e abre em nova aba
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl, "_blank");
   };
-  
+
   //FIM GERAÇÃO PDF
 
   return (
@@ -265,7 +265,12 @@ const Informacoes = () => {
                 >
                   <td className="py-4 px-4 font-bold text-right text-black">{"******"}</td>
                   <td className="py-4 px-4 text-left text-black">{info.palavrachave}</td>
-                  <td className="py-4 px-4 text-left text-black">{info.descricao}</td>
+                  <td className="py-4 px-4 text-left text-black max-w-[300px] max-h-[100px] overflow-auto">
+                    <div className="whitespace-pre-wrap break-words">
+                      {info.descricao}
+                    </div>
+                  </td>
+
                   <td className="py-4 px-4 text-black text-center flex justify-center gap-2">
                     <button
                       onClick={() => excluirInformacao(info.id)}
