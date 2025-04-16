@@ -20,7 +20,7 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
-    "lucide-react": "^0.483.0",
+    "lucide-react": "^0.484.0",
     "node-firebird": "^1.1.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
