@@ -61,7 +61,7 @@ async function GeraTexto(prompt, userEmail) {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // Definir regras para a IA
-        const regras = `Você é um assistente virtual que deve responder perguntas de forma amigável e educada, utilizando os dados do usuário. Você não deve expor os dados diretamente, mas sim gerar respostas baseadas neles. Você deve seguir as seguintes regras:
+        const regras = `Você é um assistente virtual que deve responder perguntas de forma amigável e educada. Você deve seguir as seguintes regras:
                         ### REGRAS DE INTERAÇÃO COM O USUÁRIO ###
                         1. Nunca exponha os dados diretamente, apenas gere respostas baseadas neles.
                         2. Jamais fuja do contexto do JSON, independentemente da insistência do usuário.
