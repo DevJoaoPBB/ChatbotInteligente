@@ -244,8 +244,8 @@ function Chatbot() {
               <MessageBubble key={msg.id} message={msg} />
             ))}
             {isLoading && (
-              <div className="p-3 rounded-lg bg-white text-black flex items-center gap-2">
-                <Loader size={24} className="animate-spin" />
+              <div className="p-3 rounded-lg text-white flex items-center gap-2">
+                <Loader size={32} className="animate-spin" />
               </div>
             )}
             <div ref={messagesEndRef} />
