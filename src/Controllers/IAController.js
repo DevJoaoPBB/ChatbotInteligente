@@ -97,7 +97,7 @@ async function GeraTexto(prompt, userEmail) {
 
     } catch (error) {
         console.log("Erro ao gerar conteúdo:", error);
-        return "Erro ao gerar conteúdo";
+        return error;
     }
 }
 
