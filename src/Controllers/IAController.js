@@ -58,7 +58,7 @@ async function GeraTexto(prompt, userEmail) {
 
         // Inicializar a API do Gemini
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
         // Definir regras para a IA
         const regras = `Você é um chatbot que responde apenas com base no JSON fornecido.
