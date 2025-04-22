@@ -58,7 +58,7 @@ async function GeraTexto(prompt, userEmail) {
 
         // Inicializar a API do Gemini
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // Definir regras para a IA
         const regras = `Você é um chatbot que responde apenas com base no JSON fornecido.
@@ -97,7 +97,7 @@ async function GeraTexto(prompt, userEmail) {
 
     } catch (error) {
         console.log("Erro ao gerar conteúdo:", error);
-        return error;
+        return "Erro ao gerar conteúdo";
     }
 }
 
