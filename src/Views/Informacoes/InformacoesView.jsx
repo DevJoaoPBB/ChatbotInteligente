@@ -176,70 +176,74 @@ const Informacoes = () => {
   };
 
   //GERAÇÃO DO PDF
-  const gerarPDF = (info) => {
+  const gerarPDF = async (info) => {
     const doc = new jsPDF();
-
-    // Definir o caminho para o logo
+  
+    // Logo do Google Drive convertido para base64
     const logoUrl = "https://drive.google.com/uc?export=view&id=1rfmfqREllB7Wl_PGQVO5Ou_h4izX_4mZ";
-    
-    // Definir as posições
-    const marginTop = 10;
-    const marginLeft = 10;
-    const logoWidth = 30;
-    const logoHeight = 30;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const tableWidth = pageWidth - 2 * marginLeft; // Largura da tabela igual à largura da página (menos as margens)
-    const headerHeight = 25; // Altura do cabeçalho
-
-    // Cabeçalho com logo e título dentro de um quadro
-    doc.setDrawColor(52, 73, 94); // Cor da borda do quadro
-    doc.setFillColor(236, 240, 241); // Cor de fundo do quadro
-    doc.rect(marginLeft, marginTop, tableWidth, headerHeight, 'F'); // Desenha o quadro com a mesma largura da tabela
-
-    // Inserir logo
-    doc.addImage(logoUrl, 'PNG', marginLeft + 5, marginTop - 2, logoWidth, logoHeight);
-
-    // Inserir título dentro do quadro
-    const titulo = "Cadastro de Informações";
-    doc.setTextColor(52, 73, 94); // Cor do texto do título
-    const textWidth = doc.getTextWidth(titulo);
-    const titleX = marginLeft + logoWidth + 10; // Coloca o título à direita do logo
-    const titleY = marginTop + 15; // Ajusta a posição vertical do título
-
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text(titulo, titleX, titleY);
-
-    // Adicionando a tabela
-    autoTable(doc, {
-      startY: marginTop + headerHeight + 5,
-      head: [["Campo", "Valor"]],
-      body: [
-        ["ID", "********"],
-        ["Palavra-chave", info.palavrachave],
-        ["Descrição", info.descricao],
-        ["Usuário", info.usuario],
-      ],
-      theme: "grid",
-      headStyles: {
-        fillColor: [52, 73, 94],
-        textColor: 255,
-        halign: "center",
-      },
-      styles: {
-        fontSize: 12,
-      },
-      margin: { left: marginLeft, right: marginLeft }, // <-- Essencial para alinhar com o cabeçalho
-      tableWidth: tableWidth,
-    });
-
-
-    // Gera um Blob e abre em nova aba
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, "_blank");
+  
+    try {
+      const logoBase64 = await carregarImagemComoBase64(logoUrl);
+  
+      // Configurações de layout
+      const marginTop = 10;
+      const marginLeft = 10;
+      const logoWidth = 30;
+      const logoHeight = 30;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const tableWidth = pageWidth - 2 * marginLeft;
+      const headerHeight = 25;
+  
+      // Cabeçalho com fundo e borda
+      doc.setDrawColor(52, 73, 94);
+      doc.setFillColor(236, 240, 241);
+      doc.rect(marginLeft, marginTop, tableWidth, headerHeight, 'F');
+  
+      // Inserir logo
+      doc.addImage(logoBase64, 'PNG', marginLeft + 5, marginTop - 2, logoWidth, logoHeight);
+  
+      // Título
+      const titulo = "Cadastro de Informações";
+      doc.setTextColor(52, 73, 94);
+      const titleX = marginLeft + logoWidth + 10;
+      const titleY = marginTop + 15;
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text(titulo, titleX, titleY);
+  
+      // Tabela com dados
+      autoTable(doc, {
+        startY: marginTop + headerHeight + 5,
+        head: [["Campo", "Valor"]],
+        body: [
+          ["ID", "********"],
+          ["Palavra-chave", info.palavrachave],
+          ["Descrição", info.descricao],
+          ["Usuário", info.usuario],
+        ],
+        theme: "grid",
+        headStyles: {
+          fillColor: [52, 73, 94],
+          textColor: 255,
+          halign: "center",
+        },
+        styles: {
+          fontSize: 12,
+        },
+        margin: { left: marginLeft, right: marginLeft },
+        tableWidth: tableWidth,
+      });
+  
+      // Gera e abre PDF
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, "_blank");
+    } catch (error) {
+      console.error("Erro ao gerar PDF com imagem:", error);
+      toast.error("Erro ao gerar PDF. Verifique o logo.");
+    }
   };
-
+  
   //FIM GERAÇÃO PDF
 
   return (
