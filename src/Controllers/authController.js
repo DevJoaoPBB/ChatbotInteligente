@@ -17,20 +17,16 @@ export const login = async (req, res) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // Busca nome do usuário no Firestore
-    const userRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userRef);
-
     res.json({
       success: true,
       message: "Login bem-sucedido",
-      nome: userDoc.exists() ? userDoc.data().nome : "Usuário",
       token: await user.getIdToken(), // Gera token JWT do Firebase
     });
   } catch (error) {
     return res.status(401).json({ success: false, message: "Credenciais inválidas", error: error.message });
   }
 };
+
 
 /**
  * Cadastro de novo usuário no Firebase Authentication e Firestore
