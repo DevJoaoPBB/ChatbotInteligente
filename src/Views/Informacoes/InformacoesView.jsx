@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+
 Modal.setAppElement("#root");
 
 const Informacoes = () => {
@@ -163,13 +164,24 @@ const Informacoes = () => {
     }
   };
 
+  const carregarImagemComoBase64 = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
   //GERAÇÃO DO PDF
   const gerarPDF = (info) => {
     const doc = new jsPDF();
 
     // Definir o caminho para o logo
-    const logoUrl = 'src/Views/Login/icone.png'; // Altere isso para o caminho do seu logo
-
+    const logoUrl = "https://drive.google.com/uc?export=view&id=1rfmfqREllB7Wl_PGQVO5Ou_h4izX_4mZ";
+    
     // Definir as posições
     const marginTop = 10;
     const marginLeft = 10;
