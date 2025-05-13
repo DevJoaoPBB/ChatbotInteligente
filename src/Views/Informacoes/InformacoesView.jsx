@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import icone from "./icone.png"; // Caminho relativo para o logo
 
 
 Modal.setAppElement("#root");
@@ -175,17 +176,23 @@ const Informacoes = () => {
     });
   };
 
-  //GERAÇÃO DO PDF
+  //GERAÇÃO DO PDF  
   const gerarPDF = async (info) => {
     const doc = new jsPDF();
   
-    // Logo do Google Drive convertido para base64
-    const logoUrl = "https://drive.google.com/uc?export=view&id=1rfmfqREllB7Wl_PGQVO5Ou_h4izX_4mZ";
-  
     try {
-      const logoBase64 = await carregarImagemComoBase64(logoUrl);
+      // Carrega a imagem do import (icone.png) como Blob -> base64
+      const response = await fetch(icone);
+      const blob = await response.blob();
+      const reader = new FileReader();
   
-      // Configurações de layout
+      const logoBase64 = await new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+  
+      // Layout
       const marginTop = 10;
       const marginLeft = 10;
       const logoWidth = 30;
@@ -194,24 +201,19 @@ const Informacoes = () => {
       const tableWidth = pageWidth - 2 * marginLeft;
       const headerHeight = 25;
   
-      // Cabeçalho com fundo e borda
+      // Cabeçalho
       doc.setDrawColor(52, 73, 94);
       doc.setFillColor(236, 240, 241);
       doc.rect(marginLeft, marginTop, tableWidth, headerHeight, 'F');
-  
-      // Inserir logo
       doc.addImage(logoBase64, 'PNG', marginLeft + 5, marginTop - 2, logoWidth, logoHeight);
   
-      // Título
       const titulo = "Cadastro de Informações";
       doc.setTextColor(52, 73, 94);
-      const titleX = marginLeft + logoWidth + 10;
-      const titleY = marginTop + 15;
       doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.text(titulo, titleX, titleY);
+      doc.text(titulo, marginLeft + logoWidth + 10, marginTop + 15);
   
-      // Tabela com dados
+      // Tabela
       autoTable(doc, {
         startY: marginTop + headerHeight + 5,
         head: [["Campo", "Valor"]],
@@ -234,15 +236,15 @@ const Informacoes = () => {
         tableWidth: tableWidth,
       });
   
-      // Gera e abre PDF
+      // Abre o PDF
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
       window.open(pdfUrl, "_blank");
     } catch (error) {
-      console.error("Erro ao gerar PDF com imagem:", error);
-      toast.error("Erro ao gerar PDF. Verifique o logo.");
+      console.error("Erro ao gerar PDF:", error);
     }
   };
+  
   
   //FIM GERAÇÃO PDF
 
