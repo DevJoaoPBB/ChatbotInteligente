@@ -5,6 +5,7 @@ import Informacoes from "./Views/Informacoes/InformacoesView";
 import Chatbot from "./Views/Chatbot/chatbotView";
 import Login from "./Views/Login/loginView";
 import Configuracoes from "./Views/Configurações/configuracoesView";
+import Categorias from "./Views/Categorias/categoriaView";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="informacoes" element={<Informacoes />} />
           <Route path="chatbot" element={<Chatbot />} />
           <Route path="configuracoes" element={<Configuracoes/>} />
+          <Route path="categorias" element={<Categorias/>} />
         </Route>
       </Routes>
     </Router>

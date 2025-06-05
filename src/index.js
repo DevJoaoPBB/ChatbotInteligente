@@ -10,6 +10,13 @@ import {
   editarInformacao,
   excluirInformacao,
 } from './Controllers/informacoesController.js';
+import {
+  buscarCategorias,
+  adicionarCategoria,
+  editarCategoria,
+  excluirCategoria
+} from './Controllers/categoriasController.js'
+
 import { buscarConfiguracoes } from './Controllers/configuracoesController.js'; 
 import { verifyToken } from './Middleware/authMiddleware.js'; // Middleware de autenticação
 
@@ -56,8 +63,14 @@ app.post("/informacoes", adicionarInformacao);
 app.put("/informacoes/:id", editarInformacao);
 app.delete("/informacoes/:id", excluirInformacao);
 
+//Rota de categorias
+app.get("/categorias", buscarCategorias);
+app.post("/categorias", adicionarCategoria);
+app.put("/categorias/:id", editarCategoria);
+app.delete("/categorias/:id", excluirCategoria);
+
 // Rota de configurações (Protegida)
-app.get("/configuracoes", verifyToken, buscarConfiguracoes);
+app.get("/configuracoes", buscarConfiguracoes);
 
 // Inicialização do servidor
 app.listen(PORT, "0.0.0.0", () => {
