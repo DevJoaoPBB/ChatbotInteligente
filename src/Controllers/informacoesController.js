@@ -44,6 +44,7 @@ export const adicionarInformacao = async (req, res) => {
       PALAVRASCHAVE: palavraChave,
       INFORMACAO: descricao,
       USUARIO: userEmail,
+      DATA_ATUALIZACAO: new Date().toISOString(), // Data de atualização
     });
 
     return res.json({ success: true, message: 'Informação adicionada com sucesso' });
@@ -67,6 +68,7 @@ export const editarInformacao = async (req, res) => {
     await updateDoc(docRef, { // Utilizando updateDoc para atualizar o documento
       PALAVRASCHAVE: palavraChave,
       INFORMACAO: descricao,
+      DATA_ATUALIZACAO: new Date().toISOString(), // Atualizando a data de atualização
     });
 
     return res.json({ success: true, message: 'Informação atualizada com sucesso' });
