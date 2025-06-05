@@ -157,15 +157,26 @@ const Categorias = () => {
     }
   };
 
-  const carregarImagemComoBase64 = async (url) => {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
+  const formatarData = (dataString) => {
+    if (!dataString) return "-";
+    
+    try {
+      const data = new Date(dataString);
+      
+      // Verifica se a data é válida
+      if (isNaN(data.getTime())) return dataString;
+      
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      const horas = String(data.getHours()).padStart(2, '0');
+      const minutos = String(data.getMinutes()).padStart(2, '0');
+      
+      return `${dia}/${mes}/${ano} - ${horas}:${minutos}`;
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return dataString;
+    }
   };
 
   const gerarPDF = async (categoria) => {
@@ -259,7 +270,6 @@ const Categorias = () => {
               <tr className="bg-blue-700 py-4 px-4">
                 <th className="py-4 px-4">ID</th>
                 <th className="py-4 px-4">Categoria</th>
-                <th className="py-4 px-4">Usuário</th>
                 <th className="py-4 px-4">Data de Atualização</th>
                 <th className="py-4 px-4 text-center">Ações</th>
               </tr>
@@ -272,8 +282,7 @@ const Categorias = () => {
                 >
                   <td className="px-2 font-bold text-right text-black">{cat.id}</td>
                   <td className="px-4 max-h-20 w-60 text-left text-black">{cat.categoria}</td>
-                  <td className="px-4 text-left text-black">{cat.usuario}</td>
-                  <td className="px-4 text-left text-black">{cat.data_atualizacao}</td>
+                  <td className="px-4 text-left text-black">{formatarData(cat.data_atualizacao)}</td>
                   <td className="py-4 px-4 text-black text-center flex justify-center gap-2">
                     <button
                       onClick={() => excluirCategoria(cat.id)}
