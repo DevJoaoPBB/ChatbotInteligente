@@ -270,8 +270,8 @@ const Informacoes = () => {
             <thead>
               <tr className="bg-blue-700 py-4 px-4">
                 <th className="py-4 px-4">ID</th>
-                <th className="py-4 px-4">Palavras-Chave</th>
-                <th className="py-4 px-4">Descrição</th>
+                <th className="py-4 text-left px-4">Palavras-Chave</th>
+                <th className="py-4 text-left px-4">Descrição</th>
                 <th className="py-4 px-4 text-center">Ações</th>
               </tr>
             </thead>
