@@ -32,7 +32,7 @@ export const buscarInformacoes = async (req, res) => {
 
 
 export const adicionarInformacao = async (req, res) => {
-  const { palavraChave, descricao } = req.body;
+  const { palavraChave, descricao, categoria } = req.body;
   const userEmail = req.headers['user-email'];
 
   if (!userEmail || !palavraChave || !descricao) {
@@ -43,6 +43,7 @@ export const adicionarInformacao = async (req, res) => {
     await addDoc(collection(db, userEmail), {
       PALAVRASCHAVE: palavraChave,
       INFORMACAO: descricao,
+      CATEGORIA: categoria,
       USUARIO: userEmail,
       DATA_ATUALIZACAO: new Date().toISOString(), // Data de atualização
     });
