@@ -268,9 +268,9 @@ const Categorias = () => {
           <table className="min-w-full text-white">
             <thead>
               <tr className="bg-blue-700 py-4 px-4">
-                <th className="py-4 px-4">ID</th>
-                <th className="py-4 px-4">Categoria</th>
-                <th className="py-4 px-4">Data de Atualização</th>
+                <th className="py-4 text-right px-4">ID</th>
+                <th className="py-4 text-left px-4">Categoria</th>
+                <th className="py-4 text-left px-4">Data de Atualização</th>
                 <th className="py-4 px-4 text-center">Ações</th>
               </tr>
             </thead>
