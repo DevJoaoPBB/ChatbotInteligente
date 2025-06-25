@@ -76,14 +76,7 @@ function Principal() {
             <Home size={28} className="min-w-[28px]" />
             {isOpen && <span className="ml-2 text-left">Home</span>}
           </NavLink>
-
-          <NavLink to="/categorias" className={({ isActive }) =>
-            `flex items-center p-2 rounded-full transition-all duration-200 ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-11"}`}
-          >
-            <Tag size={28} className="min-w-[28px]" />
-            {isOpen && <span className="ml-2 text-left">Categorias</span>}
-          </NavLink>
-
+          
           <NavLink to="/informacoes" className={({ isActive }) =>
             `flex items-center p-2 rounded-full transition-all duration-200 ${isActive ? "bg-blue-700" : "hover:bg-gray-800"} ${isOpen ? "w-full" : "w-11"}`}
           >
