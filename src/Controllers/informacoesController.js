@@ -43,7 +43,6 @@ export const adicionarInformacao = async (req, res) => {
     await addDoc(collection(db, userEmail), {
       PALAVRASCHAVE: palavraChave,
       INFORMACAO: descricao,
-      CATEGORIA: categoria,
       USUARIO: userEmail,
       DATA_ATUALIZACAO: new Date().toISOString(), // Data de atualização
     });
