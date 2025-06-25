@@ -58,7 +58,7 @@ async function GeraTexto(prompt, userEmail) {
 
         // Inicializar a API do Gemini
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
         // Definir regras para a IA
         const regras = `Você é um assistente virtual que deve responder perguntas de forma amigável e educada. Você deve seguir as seguintes regras:
